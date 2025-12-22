@@ -1,7 +1,7 @@
 <?php
 $name = "localhost";
-$username = "zen_root_mk_gold_finance";
-$password = "2hpMPxJ838LcL4hL";
+$username = "root";
+$password = "";
 $database = "mk_gold_finance";
 
 $conn = new mysqli($name, $username, $password, $database);
@@ -140,7 +140,6 @@ function generateReceiptNo()
         if ($lastReciptNo) {
             // Increment the last receipt number by 1
             $newReciptNo = intval($lastReciptNo) + 1;
-
         } else {
             // If no valid receipt number is found, start with 1001
             $newReciptNo = '101';
@@ -171,7 +170,6 @@ function generateReceiptesitmateNo()
 
             // Increment the last receipt number by 1
             $newReciptNo = intval($lastReciptNo) + 1;
-
         } else {
             // If no valid receipt number is found, start with 001
             $newReciptNo = '101';
@@ -304,7 +302,6 @@ function ImageRemove($string, $id)
         } else {
             $status = "User Image Not Removed !";
         }
-
     } else if ($string == "staff") {
         $sql_staff = "UPDATE `staff` SET `img`=null WHERE `id`='$id' ";
         if ($conn->query($sql_staff) === TRUE) {
@@ -312,7 +309,6 @@ function ImageRemove($string, $id)
         } else {
             $status = "staff Image Not Removed !";
         }
-
     } else if ($string == "company") {
         $sql_company = "UPDATE `company` SET  `img`=null WHERE `id`='$id' ";
         if ($conn->query($sql_company) === TRUE) {
@@ -327,8 +323,6 @@ function ImageRemove($string, $id)
         } else {
             $status = "products Image Not Removed !";
         }
-
-
     }
     return $status;
 }
@@ -342,7 +336,6 @@ function uniqueID($prefix_name, $auto_increment_id)
     $hashid = md5($encryptId);
 
     return $hashid;
-
 }
 
 /**
@@ -359,7 +352,7 @@ function getBalance($conn)
 /**
  * Add a transaction (Expense = patru, Income = varavu)
  */
-function addTransaction($conn, $description, $amount, $type,$date)
+function addTransaction($conn, $description, $amount, $type, $date)
 {
     if (!$description || $amount <= 0 || !in_array($type, ['varavu', 'patru', 'balance'])) {
         return ["head" => ["code" => 400, "msg" => "Invalid input!"]];
@@ -367,7 +360,7 @@ function addTransaction($conn, $description, $amount, $type,$date)
 
     $current_balance = getBalance($conn);
 
-    if ($type !== 'balance') { 
+    if ($type !== 'balance') {
         // Check if balance is sufficient for expense
         if ($type === 'patru' && $current_balance < $amount) {
             return ["head" => ["code" => 400, "msg" => "Insufficient balance!"]];
@@ -390,7 +383,7 @@ function addTransaction($conn, $description, $amount, $type,$date)
     // Insert transaction record using prepared statement
     $insert_transaction_query = "INSERT INTO transactions (description, amount, type,transaction_date) VALUES (?, ?, ?,?)";
     $stmt = $conn->prepare($insert_transaction_query);
-    $stmt->bind_param("sdss", $description, $amount, $type,$date); // s = string, d = double, s = string
+    $stmt->bind_param("sdss", $description, $amount, $type, $date); // s = string, d = double, s = string
 
     if ($stmt->execute()) {
         $stmt->close();
