@@ -142,7 +142,7 @@ elseif (isset($obj['receipt_no'])) {
     $interest_income = floatval($obj['interest_income'] ?? 0);
     $refund_amount = floatval($obj['refund_amount'] ?? 0);
     $other_amount = floatval($obj['other_amount'] ?? 0);
-    $pawnjewelry_recovery_date = $conn->real_escape_string(trim($obj['pawnjewelry_recovery_date']));
+   $pawnjewelry_recovery_date = isset($obj['pawnjewelry_recovery_date']) && !empty($obj['pawnjewelry_recovery_date']) ? $conn->real_escape_string(trim($obj['pawnjewelry_recovery_date'])) : date('Y-m-d');
     $interest_payment_periods = $conn->real_escape_string(trim($obj['interest_payment_periods'] ?? ''));
 
     $customer_pic_input = $obj['customer_pic'] ?? [];
@@ -233,13 +233,26 @@ elseif (isset($obj['receipt_no'])) {
             `create_at`, `delete_at`
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 
-        $insertStmt->bind_param("ssssssdssdssdssss",
-            $pawnjewelry_date, $receipt_no, $name, $customer_details, $place, $mobile_number,
-            $original_amount, $interest_rate, $products_json, $interest_income, $refund_amount,
-            $other_amount, $pawnjewelry_recovery_date, $interest_payment_periods,
-            $customerJson, $customerBase64Json,
-            $timestamp
-        );
+$insertStmt->bind_param(
+  "ssssssdsdsddsssss",
+  $pawnjewelry_date,          // s
+  $receipt_no,                // s
+  $name,                      // s
+  $customer_details,          // s
+  $place,                     // s
+  $mobile_number,             // s
+  $original_amount,           // d
+  $interest_rate,             // s
+  $products_json,             // s
+  $interest_income,           // d
+  $refund_amount,             // d
+  $other_amount,              // d
+  $pawnjewelry_recovery_date, // s  ✅ FIXED
+  $interest_payment_periods,  // s
+  $customerJson,              // s
+  $customerBase64Json,        // s
+  $timestamp                  // s
+);
 
         if ($insertStmt->execute()) {
             $id = $conn->insert_id;
@@ -275,14 +288,27 @@ elseif (isset($obj['receipt_no'])) {
             `customer_pic` = ?, `customer_pic_base64code` = ?
             WHERE `pawnjewelry_recovery_id` = ?");
 
-        $updateStmt->bind_param("ssssssdssdssdssss",
-            $pawnjewelry_date, $receipt_no, $name, $customer_details,
-            $place, $mobile_number, $original_amount, $interest_rate,
-            $products_json, $interest_income, $refund_amount, $other_amount,
-            $pawnjewelry_recovery_date, $interest_payment_periods,
-            $customerJson, $customerBase64Json,
-            $edit_id
-        );
+   $updateStmt->bind_param(
+  "ssssssdsdsddsssss",
+  $pawnjewelry_date,
+  $receipt_no,
+  $name,
+  $customer_details,
+  $place,
+  $mobile_number,
+  $original_amount,
+  $interest_rate,
+  $products_json,
+  $interest_income,
+  $refund_amount,
+  $other_amount,
+  $pawnjewelry_recovery_date, // ✅ NOW SAVES
+  $interest_payment_periods,
+  $customerJson,
+  $customerBase64Json,
+  $edit_id
+);
+
 
         if ($updateStmt->execute()) {
             $output["head"]["code"] = 200;
